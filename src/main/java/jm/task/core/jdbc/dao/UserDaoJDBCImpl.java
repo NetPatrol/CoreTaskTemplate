@@ -20,7 +20,7 @@ public class UserDaoJDBCImpl implements UserDao {
                     "age int, " +
                     "primary key (id))")) {
             statement.execute();
-            System.out.println("Таблица готова.");
+            System.out.println("\nТаблица готова.");
         } catch (SQLException e) {
             System.err.format("Упсс...\nПохоже пользователь не был добавлен.\nSQL ERROR: %s\n", e.getSQLState());
             e.printStackTrace();
@@ -30,7 +30,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
         try (PreparedStatement statement = util.connect().prepareStatement("drop table if exists users cascade")) {
             statement.execute();
-            System.out.println("Таблица успешно удалена.");
+            System.out.println("\nТаблица успешно удалена.");
         } catch (SQLException e) {
             System.err.format("Упсс...\nПохоже пользователь не был добавлен.\nSQL ERROR: %s\n", e.getSQLState());
             e.printStackTrace();
@@ -49,7 +49,7 @@ public class UserDaoJDBCImpl implements UserDao {
             ResultSet test = statement.executeQuery("select * from users where name = '" + name + "'");
 
             while (test.next()) {
-                System.out.printf("Пользователь с именем %s %s успешно добавлен\n", test.getString("name"), test.getString("lastName"));
+                System.out.printf("\nПользователь с именем %s %s успешно добавлен", test.getString("name"), test.getString("lastName"));
             }
         } catch (SQLException e) {
             System.err.format("Упсс...\nПохоже пользователь %s %s не был добавлен.\nSQL ERROR: %s\n",
