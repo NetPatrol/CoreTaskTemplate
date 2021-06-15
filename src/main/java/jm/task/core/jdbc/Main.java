@@ -22,7 +22,9 @@ public class Main {
         System.out.println("=================================================================");
         System.out.println("Выводим список всех пользователей...");
         List<User> users = new ArrayList<>(service.getAllUsers());
-        users.forEach(System.out::println);
+        users.stream()
+                .sorted((u1, u2) -> u1.getName().compareToIgnoreCase(u2.getName()))
+                .forEach(System.out::println);
         System.out.println("=================================================================");
         System.out.println("Очищаем и удаляем таблицу пользователей");
         service.cleanUsersTable();
