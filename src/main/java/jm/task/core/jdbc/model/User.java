@@ -64,6 +64,6 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("Пользователь id: %d | %s %s, возраст: %d ", id, name, lastName, age);
+        return String.format("id: %d %s %s, возраст: %d ", this.id, this.name, this.lastName, this.age);
     }
 }

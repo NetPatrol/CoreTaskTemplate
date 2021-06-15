@@ -4,6 +4,8 @@ import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.service.*;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
@@ -19,9 +21,8 @@ public class Main {
         service.saveUser("Семен", "Слепаков", (byte) 41);
         System.out.println("=================================================================");
         System.out.println("Выводим список всех пользователей...");
-        for (User user : service.getAllUsers()) {
-            System.out.println(user);
-        }
+        List<User> users = new ArrayList<>(service.getAllUsers());
+        users.forEach(System.out::println);
         System.out.println("=================================================================");
         System.out.println("Очищаем и удаляем таблицу пользователей");
         service.cleanUsersTable();
