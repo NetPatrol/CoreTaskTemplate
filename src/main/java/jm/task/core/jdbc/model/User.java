@@ -64,10 +64,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "\nПользователь: " +
-                " id: " + id +
-                " Имя: " + name +
-                " Фамилия: " + lastName +
-                " Возраст: " + age + " лет";
+        return String.format("Пользователь id: %d | %s %s, возраст: %d ", id, name, lastName, age);
     }
 }

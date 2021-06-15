@@ -28,7 +28,6 @@ public class Util {
                     property.getProperty("db.base");
             
             connect = DriverManager.getConnection(url, user, password);
-            System.out.printf("\nподключились к БД: %s", property.getProperty("db.base"));
         } catch (SQLException | IOException | ClassNotFoundException e) {
             System.err.format("Ошибка подключения к базе данных %s", property.getProperty("db.base"));
             e.printStackTrace();

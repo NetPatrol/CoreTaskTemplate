@@ -20,7 +20,7 @@ public class UserDaoJDBCImpl implements UserDao {
                     "age int, " +
                     "primary key (id))")) {
             statement.execute();
-            System.out.println("\nТаблица готова.");
+            System.out.println("Таблица готова.");
         } catch (SQLException e) {
             System.err.format("Упсс...\nПохоже пользователь не был добавлен.\nSQL ERROR: %s\n", e.getSQLState());
             e.printStackTrace();
@@ -30,9 +30,9 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
         try (PreparedStatement statement = util.connect().prepareStatement("drop table if exists users cascade")) {
             statement.execute();
-            System.out.println("\nТаблица успешно удалена.");
+            System.out.println("Таблица успешно удалена.");
         } catch (SQLException e) {
-            System.err.format("Упсс...\nПохоже пользователь не был добавлен.\nSQL ERROR: %s\n", e.getSQLState());
+            System.err.format("Упсс...\nКакие-то проблемы с удалением таблицы.\nSQL ERROR: %s\n", e.getSQLState());
             e.printStackTrace();
         }
     }
@@ -49,7 +49,7 @@ public class UserDaoJDBCImpl implements UserDao {
             ResultSet test = statement.executeQuery("select * from users where name = '" + name + "'");
 
             while (test.next()) {
-                System.out.printf("\nПользователь с именем %s %s успешно добавлен", test.getString("name"), test.getString("lastName"));
+                System.out.printf("Пользователь с именем %s %s успешно добавлен\n", test.getString("name"), test.getString("lastName"));
             }
         } catch (SQLException e) {
             System.err.format("Упсс...\nПохоже пользователь %s %s не был добавлен.\nSQL ERROR: %s\n",
@@ -93,7 +93,7 @@ public class UserDaoJDBCImpl implements UserDao {
         try (Connection connection = util.connect()) {
             PreparedStatement statement = connection.prepareStatement("TRUNCATE TABLE users");
             statement.executeUpdate();
-            System.out.println("\nТаблица успешно очищена.");
+            System.out.println("Таблица успешно очищена.");
         } catch (SQLException e) {
             System.out.println("Невозможно очистить таблицу пользователей");
         }
