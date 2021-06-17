@@ -17,6 +17,7 @@ public class Main {
         System.out.println("Добавляем пользователей...");
         service.saveUser("Тимур", "Батрутдинов", (byte) 38);
         service.saveUser("Гарик", "Мартиросян", (byte) 44);
+        service.saveUser("Гарик", "Мартиросян", (byte) 44);
         service.saveUser("Павел", "Воля", (byte) 40);
         service.saveUser("Семен", "Слепаков", (byte) 41);
 
