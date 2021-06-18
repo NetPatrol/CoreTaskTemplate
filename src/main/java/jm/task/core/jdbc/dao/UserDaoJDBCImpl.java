@@ -18,6 +18,7 @@ public class UserDaoJDBCImpl implements UserDao {
     private static String SELECT_USER = SqlQuery.SELECT_USER.toString();
     private static String SELECT_USER_ID = SqlQuery.SELECT_BY_ID.toString();
     private static String INSERT_USER = SqlQuery.INSERT.toString();
+    private static String UPDATE_USER = SqlQuery.UPDATE_USER.toString();
     private static String DELETE_USER = SqlQuery.DELETE.toString();
                            
     public UserDaoJDBCImpl() {
@@ -104,29 +105,39 @@ public class UserDaoJDBCImpl implements UserDao {
         connection = util.connect();
         PreparedStatement pstm = null;
         try {
+            connection.setAutoCommit(false);
             pstm = connection.prepareStatement(SELECT_USER_ID);
             pstm.setLong(1, id);
             ResultSet response = pstm.executeQuery();
             if (response.next()) {
                 String oldUserName = response.getString("name");
                 String oldUserLastName = response.getString("lastname");
-                pstm = connection.prepareStatement("UPDATE users SET name = ?, lastName = ?, age = ? WHERE id = ?" );
+                pstm = connection.prepareStatement(UPDATE_USER);
                 pstm.setString(1, name);
                 pstm.setString(2, lastName);
                 pstm.setByte(3, age);
                 pstm.setLong(4, id);
                 int i = pstm.executeUpdate();
+                connection.commit();
                 if (i > 0) {
                     System.out.printf("Данные пользователя %s %s успешно изменены.", oldUserLastName, oldUserName);
-                    System.out.printf("\nТекущие данные пользователя с id %d:\nФамилия: %s Имя: %s, возраст: %d.\n", id, lastName, name, age);
+                    System.out.printf("\nТекущие данные пользователя с id %d:" +
+                            "\nФамилия: %s Имя: %s, возраст: %d.\n", id, lastName, name, age);
+                    connection.close();
                 } else {
                     System.out.println("\nНе удалось обновить данные пользователя.");
+                    connection.close();
                 }
-                pstm.close();
             }
-            connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            try {
+                if (connection != null) {
+                    System.err.print("Выполняется откат транзакции");
+                    connection.rollback();
+                }
+            } catch (SQLException throwables) {
+                e.printStackTrace();
+            }
         }
     }
 
