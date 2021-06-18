@@ -11,14 +11,14 @@ public class UserDaoJDBCImpl implements UserDao {
     private static Util util = new Util();
     private static Connection connection;
 
-    String CREATE_TABLE = SqlQuery.CREATE.toString();
-    String DROP_TABLE = SqlQuery.DROP.toString();
-    String TRUNCATE_TABLE = SqlQuery.TRUNCATE.toString();
-    String SELECT_ALL = SqlQuery.SELECT.toString();
-    String SELECT_USER = SqlQuery.SELECT_USER.toString();
-    String SELECT_USER_ID = SqlQuery.SELECT_BY_ID.toString();
-    String INSERT_USER = SqlQuery.INSERT.toString();
-    String DELETE_USER = SqlQuery.DELETE.toString();
+    private static String CREATE_TABLE = SqlQuery.CREATE.toString();
+    private static String DROP_TABLE = SqlQuery.DROP.toString();
+    private static String TRUNCATE_TABLE = SqlQuery.TRUNCATE.toString();
+    private static String SELECT_ALL = SqlQuery.SELECT.toString();
+    private static String SELECT_USER = SqlQuery.SELECT_USER.toString();
+    private static String SELECT_USER_ID = SqlQuery.SELECT_BY_ID.toString();
+    private static String INSERT_USER = SqlQuery.INSERT.toString();
+    private static String DELETE_USER = SqlQuery.DELETE.toString();
                            
     public UserDaoJDBCImpl() {
     }
@@ -53,7 +53,7 @@ public class UserDaoJDBCImpl implements UserDao {
             pstm.setByte(3, age);
             ResultSet result = pstm.executeQuery();
             if (result.next()) {
-                System.out.println("Такой пользователь уже существует.");
+                System.out.print("\nТакой пользователь уже существует.");
                 pstm.close();
             } else {
                 pstm = connection.prepareStatement(INSERT_USER);
@@ -62,7 +62,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 pstm.setByte(3, age);
                 int i = pstm.executeUpdate();
                 if (i > 0) {
-                    System.out.printf("\nПользователь  %s %s %d добавлен в таблицу.", lastName, name, i);
+                    System.out.printf("\nПользователь  %s %s добавлен в таблицу.", lastName, name);
                 } else {
                     System.out.println("\nНе удалось добавить пользователя.");
                 }
@@ -74,7 +74,7 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
-        public void removeUserById(long id) {
+    public void removeUserById(long id) {
         connection = util.connect();
         PreparedStatement pstm = null;
         try {
@@ -88,14 +88,45 @@ public class UserDaoJDBCImpl implements UserDao {
                 pstm.setLong(1, id);
                 int i = pstm.executeUpdate();
                 if (i > 0) {
-                    System.out.printf("Пользователь %s %s успешно удален", lastName, name);
+                    System.out.printf("Пользователь %s %s успешно удален\n", lastName, name);
                 }
             } else {
                 System.out.println("Пользователя с таким ID не существует.");
             }
+            pstm.close();
             connection.close();
         } catch (SQLException e) {
             e.getSQLState();
+        }
+    }
+
+    public void updateUser(long id, String name, String lastName, byte age) {
+        connection = util.connect();
+        PreparedStatement pstm = null;
+        try {
+            pstm = connection.prepareStatement(SELECT_USER_ID);
+            pstm.setLong(1, id);
+            ResultSet response = pstm.executeQuery();
+            if (response.next()) {
+                String oldUserName = response.getString("name");
+                String oldUserLastName = response.getString("lastname");
+                pstm = connection.prepareStatement("UPDATE users SET name = ?, lastName = ?, age = ? WHERE id = ?" );
+                pstm.setString(1, name);
+                pstm.setString(2, lastName);
+                pstm.setByte(3, age);
+                pstm.setLong(4, id);
+                int i = pstm.executeUpdate();
+                if (i > 0) {
+                    System.out.printf("Данные пользователя %s %s успешно изменены.", oldUserLastName, oldUserName);
+                    System.out.printf("\nТекущие данные пользователя с id %d:\nФамилия: %s Имя: %s, возраст: %d.\n", id, lastName, name, age);
+                } else {
+                    System.out.println("\nНе удалось обновить данные пользователя.");
+                }
+                pstm.close();
+            }
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -104,13 +135,17 @@ public class UserDaoJDBCImpl implements UserDao {
         connection = util.connect();
         try (Statement statement = connection.createStatement()) {
             ResultSet response = statement.executeQuery(SELECT_ALL);
-            while (response.next()) {
-                User user = new User();
-                user.setId(response.getLong("id"));
-                user.setName(response.getString("name"));
-                user.setLastName(response.getString("lastName"));
-                user.setAge(response.getByte("age"));
-                all.add(user);
+            if (response.next()) {
+                while (response.next()) {
+                    User user = new User();
+                    user.setId(response.getLong("id"));
+                    user.setName(response.getString("name"));
+                    user.setLastName(response.getString("lastName"));
+                    user.setAge(response.getByte("age"));
+                    all.add(user);
+                }
+            } else {
+                System.out.println("\nВ таблице пользователей не ни одной записи");
             }
             statement.close();
             connection.close();

@@ -29,6 +29,11 @@ public class UserServiceImpl implements UserService {
         return query.getAllUsers();
     }
 
+    @Override
+    public void updateUser(long id, String name, String lastName, byte age) {
+        query.updateUser(id, name, lastName, age);
+    }
+
     public void cleanUsersTable() throws SQLException {
         query.cleanUsersTable();
     }

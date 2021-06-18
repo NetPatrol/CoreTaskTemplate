@@ -36,6 +36,11 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     @Override
+    public void updateUser(long id, String name, String lastName, byte age) {
+
+    }
+
+    @Override
     public void cleanUsersTable() {
 
     }
