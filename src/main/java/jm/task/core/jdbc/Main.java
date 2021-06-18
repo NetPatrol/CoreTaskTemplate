@@ -28,7 +28,7 @@ public class Main {
         System.out.println();
         getUsers(service);
 
-        System.out.println("\nУдаляем пользователя с номером id 3");
+        System.out.print("\nУдаляем пользователя с номером id 3");
         service.removeUserById(3);
         getUsers(service);
 

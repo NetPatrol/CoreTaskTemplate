@@ -88,7 +88,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 pstm.setLong(1, id);
                 int i = pstm.executeUpdate();
                 if (i > 0) {
-                    System.out.printf("Пользователь %s %s успешно удален\n", lastName, name);
+                    System.out.printf("\nПользователь %s %s успешно удален\n", lastName, name);
                 }
             } else {
                 System.out.println("Пользователя с таким ID не существует.");
@@ -135,7 +135,6 @@ public class UserDaoJDBCImpl implements UserDao {
         connection = util.connect();
         try (Statement statement = connection.createStatement()) {
             ResultSet response = statement.executeQuery(SELECT_ALL);
-            if (response.next()) {
                 while (response.next()) {
                     User user = new User();
                     user.setId(response.getLong("id"));
@@ -144,10 +143,6 @@ public class UserDaoJDBCImpl implements UserDao {
                     user.setAge(response.getByte("age"));
                     all.add(user);
                 }
-            } else {
-                System.out.println("\nВ таблице пользователей не ни одной записи");
-            }
-            statement.close();
             connection.close();
         } catch (SQLException e) {
             e.getSQLState();
