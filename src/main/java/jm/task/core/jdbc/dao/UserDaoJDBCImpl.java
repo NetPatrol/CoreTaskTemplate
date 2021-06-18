@@ -19,7 +19,7 @@ public class UserDaoJDBCImpl implements UserDao {
     String SELECT_USER_ID = SqlQuery.SELECT_BY_ID.toString();
     String INSERT_USER = SqlQuery.INSERT.toString();
     String DELETE_USER = SqlQuery.DELETE.toString();
-
+                           
     public UserDaoJDBCImpl() {
     }
 
