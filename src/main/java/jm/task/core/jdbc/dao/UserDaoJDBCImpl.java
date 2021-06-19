@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private static Util util = new Util();
     private static Connection connection;
 
     private static String CREATE_TABLE = SqlQuery.CREATE.toString();
@@ -26,7 +25,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        connection = util.connect();
+        connection = Util.connect();
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(CREATE_TABLE);
             statement.close();
@@ -38,7 +37,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-        connection = util.connect();
+        connection = Util.connect();
         try (Statement statement = connection.createStatement()) {
             statement.execute(DROP_TABLE);
             statement.close();
@@ -50,7 +49,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        connection = util.connect();
+        connection = Util.connect();
         PreparedStatement pstm = null;
         try {
             pstm = connection.prepareStatement(SELECT_USER);
@@ -82,7 +81,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void removeUserById(long id) throws SQLException {
-        connection = util.connect();
+        connection = Util.connect();
         PreparedStatement pstm = null;
         try {
             connection.setAutoCommit(false);
@@ -113,7 +112,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void updateUser(long id, String name, String lastName, byte age) {
-        connection = util.connect();
+        connection = Util.connect();
         PreparedStatement pstm = null;
         try {
             connection.setAutoCommit(false);
@@ -158,7 +157,7 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         List<User> all = new ArrayList<>();
-        connection = util.connect();
+        connection = Util.connect();
         try (Statement statement = connection.createStatement()) {
             ResultSet response = statement.executeQuery(SELECT_ALL);
             while (response.next()) {
@@ -178,7 +177,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
-        connection = util.connect();
+        connection = Util.connect();
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(TRUNCATE_TABLE);
             connection.close();
