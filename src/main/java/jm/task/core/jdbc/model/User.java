@@ -64,6 +64,8 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("%-6d%-8s %-20s %d", this.id, this.name, this.lastName, this.age);
+        return String.format("%-1s%-5d%-10s%-17s %d\n" +
+                        "----:-------:-----------------:--------:",
+                "", this.id, this.name, this.lastName, this.age);
     }
 }

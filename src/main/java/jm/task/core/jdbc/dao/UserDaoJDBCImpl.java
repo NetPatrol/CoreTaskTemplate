@@ -24,26 +24,31 @@ public class UserDaoJDBCImpl implements UserDao {
     public UserDaoJDBCImpl() {
     }
 
+    @Override
     public void createUsersTable() {
         connection = util.connect();
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(CREATE_TABLE);
+            statement.close();
             connection.close();
         } catch (SQLException e) {
             e.getSQLState();
         }
     }
 
+    @Override
     public void dropUsersTable() {
         connection = util.connect();
         try (Statement statement = connection.createStatement()) {
             statement.execute(DROP_TABLE);
+            statement.close();
             connection.close();
         } catch (SQLException e) {
             e.getSQLState();
         }
     }
 
+    @Override
     public void saveUser(String name, String lastName, byte age) {
         connection = util.connect();
         PreparedStatement pstm = null;
@@ -75,10 +80,12 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
-    public void removeUserById(long id) {
+    @Override
+    public void removeUserById(long id) throws SQLException {
         connection = util.connect();
         PreparedStatement pstm = null;
         try {
+            connection.setAutoCommit(false);
             pstm = connection.prepareStatement(SELECT_USER_ID);
             pstm.setLong(1, id);
             ResultSet result = pstm.executeQuery();
@@ -88,19 +95,23 @@ public class UserDaoJDBCImpl implements UserDao {
                 pstm = connection.prepareStatement(DELETE_USER);
                 pstm.setLong(1, id);
                 int i = pstm.executeUpdate();
+                connection.commit();
+                pstm.close();
                 if (i > 0) {
                     System.out.printf("\nПользователь %s %s успешно удален\n", lastName, name);
+                    connection.close();
                 }
             } else {
                 System.out.println("Пользователя с таким ID не существует.");
             }
-            pstm.close();
-            connection.close();
         } catch (SQLException e) {
+            connection.rollback();
+            connection.close();
             e.getSQLState();
         }
     }
 
+    @Override
     public void updateUser(long id, String name, String lastName, byte age) {
         connection = util.connect();
         PreparedStatement pstm = null;
@@ -119,6 +130,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 pstm.setLong(4, id);
                 int i = pstm.executeUpdate();
                 connection.commit();
+                pstm.close();
                 if (i > 0) {
                     System.out.printf("Данные пользователя %s %s успешно изменены.", oldUserLastName, oldUserName);
                     System.out.printf("\nТекущие данные пользователя с id %d:" +
@@ -134,26 +146,29 @@ public class UserDaoJDBCImpl implements UserDao {
                 if (connection != null) {
                     System.err.print("Выполняется откат транзакции");
                     connection.rollback();
+                    connection.close();
                 }
+                e.getSQLState();
             } catch (SQLException throwables) {
-                e.printStackTrace();
+                throwables.getSQLState();
             }
         }
     }
 
+    @Override
     public List<User> getAllUsers() {
         List<User> all = new ArrayList<>();
         connection = util.connect();
         try (Statement statement = connection.createStatement()) {
             ResultSet response = statement.executeQuery(SELECT_ALL);
-                while (response.next()) {
-                    User user = new User();
-                    user.setId(response.getLong("id"));
-                    user.setName(response.getString("name"));
-                    user.setLastName(response.getString("lastName"));
-                    user.setAge(response.getByte("age"));
-                    all.add(user);
-                }
+            while (response.next()) {
+                User user = new User();
+                user.setId(response.getLong("id"));
+                user.setName(response.getString("name"));
+                user.setLastName(response.getString("lastName"));
+                user.setAge(response.getByte("age"));
+                all.add(user);
+            }
             connection.close();
         } catch (SQLException e) {
             e.getSQLState();
@@ -161,6 +176,7 @@ public class UserDaoJDBCImpl implements UserDao {
         return all;
     }
 
+    @Override
     public void cleanUsersTable() {
         connection = util.connect();
         try (Statement statement = connection.createStatement()) {

@@ -8,16 +8,15 @@ import java.util.Date;
 import java.util.Properties;
 
 public class Util {
-    private Connection connection;
-    String user;
-    String password;
+    private static Connection connection;
+    private static String user;
 
-    public Connection connect() {
+    public static Connection connect() {
         Properties property = new Properties();
         try (FileInputStream input = new FileInputStream("src/main/Resources/mysql_config")) {
             property.load(input);
             user = property.getProperty("db.login");
-            password = property.getProperty("db.password");
+            String password = property.getProperty("db.password");
 
             Class.forName("com.mysql.cj.jdbc.Driver");
             StringBuilder url = new StringBuilder();
@@ -33,7 +32,7 @@ public class Util {
         return connection;
     }
 
-    public void printConnectionInfo(Connection connection) throws SQLException {
+    public static void printConnectionInfo(Connection connection) throws SQLException {
         System.out.println(new Date());
         System.out.printf("Текущий ползователь: %s\n", user);
         System.out.println("------------------------------------------------");

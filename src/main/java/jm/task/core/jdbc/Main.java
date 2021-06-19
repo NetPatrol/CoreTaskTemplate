@@ -1,19 +1,19 @@
 package jm.task.core.jdbc;
 
-
+import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.service.*;
 import jm.task.core.jdbc.util.Util;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
-        Util util = new Util();
-        Connection connection = util.connect();
-        util.printConnectionInfo(connection);
-
+        double start = System.currentTimeMillis();
         UserService service = new UserServiceImpl();
+        Connection connection = Util.connect();
+        Util.printConnectionInfo(connection);
 
         System.out.println("Создаем таблицу пользователей...");
         service.createUsersTable();
@@ -39,17 +39,21 @@ public class Main {
         System.out.println("\nОчищаем и удаляем таблицу пользователей");
         service.cleanUsersTable();
         service.dropUsersTable();
+        double stop = System.currentTimeMillis() - start;
+        System.out.printf("Скорость выполнения %.3f миллисекунд", stop);
     }
 
 
     private static void getUsers(UserService service) {
-        if (service.getAllUsers().size() == 0) {
-            System.out.printf("\nТекущее количество пользователей пользователей: %d\n", service.getAllUsers().size());
+        List<User> users = service.getAllUsers();
+        if (users.isEmpty()) {
+            System.out.printf("\nТекущее количество пользователей пользователей: %d\n", 0);
         } else {
-            System.out.printf("\nТекущее количество пользователей пользователей: %d\n", service.getAllUsers().size());
-            System.out.printf("%-8s%s\n", "","ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ");
-            System.out.printf("%-6s%-9s%-19s%s\n", "ID", "ИМЯ", "ФАМИЛИЯ", "ВОЗРАСТ");
-            service.getAllUsers().stream()
+            System.out.printf("\nТекущее количество пользователей пользователей: %d\n", users.size());
+            System.out.printf("%-9s%s\n", "", "ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ");
+            System.out.printf("%-1s%-6s%-10s%-15s%s\n", "", "ID", "ИМЯ", "ФАМИЛМЯ", "ВОЗРАСТ");
+            System.out.println("----:-------:-----------------:--------:");
+            users.stream()
                     .sorted((u1, u2) -> u1.getName().compareToIgnoreCase(u2.getName()))
                     .forEach(System.out::println);
         }
