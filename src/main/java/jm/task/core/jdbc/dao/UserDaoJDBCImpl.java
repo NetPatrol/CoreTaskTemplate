@@ -80,11 +80,10 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     @Override
-    public void removeUserById(long id) throws SQLException {
-        connection = Util.connect();
+    public void removeUserById(long id) {
+        Connection connection = Util.connect();
         PreparedStatement pstm = null;
         try {
-            connection.setAutoCommit(false);
             pstm = connection.prepareStatement(SELECT_USER_ID);
             pstm.setLong(1, id);
             ResultSet result = pstm.executeQuery();
@@ -94,25 +93,22 @@ public class UserDaoJDBCImpl implements UserDao {
                 pstm = connection.prepareStatement(DELETE_USER);
                 pstm.setLong(1, id);
                 int i = pstm.executeUpdate();
-                connection.commit();
-                pstm.close();
-                if (i > 0) {
-                    System.out.printf("\nПользователь %s %s успешно удален\n", lastName, name);
-                    connection.close();
-                }
+                String answer = i > 0 ? String.format("\nПользователь %s %s успешно удален\n", lastName, name)
+                        : "Пользователя с таким ID не существует.";
+                System.out.println(answer);
             } else {
-                System.out.println("Пользователя с таким ID не существует.");
+                System.err.println("Ошибка соединения");
             }
-        } catch (SQLException e) {
-            connection.rollback();
+            pstm.close();
             connection.close();
+        } catch (SQLException e) {
             e.getSQLState();
         }
     }
 
     @Override
     public void updateUser(long id, String name, String lastName, byte age) {
-        connection = Util.connect();
+        Connection connection = Util.connect();
         PreparedStatement pstm = null;
         try {
             connection.setAutoCommit(false);
@@ -129,27 +125,23 @@ public class UserDaoJDBCImpl implements UserDao {
                 pstm.setLong(4, id);
                 int i = pstm.executeUpdate();
                 connection.commit();
-                pstm.close();
-                if (i > 0) {
-                    System.out.printf("Данные пользователя %s %s успешно изменены.", oldUserLastName, oldUserName);
-                    System.out.printf("\nТекущие данные пользователя с id %d:" +
-                            "\nФамилия: %s Имя: %s, возраст: %d.\n", id, lastName, name, age);
-                    connection.close();
-                } else {
-                    System.out.println("\nНе удалось обновить данные пользователя.");
-                    connection.close();
-                }
+                String answer = i > 0 ? String.format("Данные пользователя %s %s успешно изменены." +
+                                "\nТекущие данные пользователя с id %d:\nФамилия: %s Имя: %s, возраст: %d.\n",
+                                oldUserLastName, oldUserName, id, lastName, name, age)
+                                : "\nНе удалось обновить данные пользователя.";
+                System.out.println(answer);
+                connection.close();
+            } else {
+                System.err.println("Ошибка соединения");
             }
         } catch (SQLException e) {
             try {
                 if (connection != null) {
                     System.err.print("Выполняется откат транзакции");
                     connection.rollback();
-                    connection.close();
                 }
-                e.getSQLState();
             } catch (SQLException throwables) {
-                throwables.getSQLState();
+                e.printStackTrace();
             }
         }
     }
